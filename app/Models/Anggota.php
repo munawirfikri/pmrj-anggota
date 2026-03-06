@@ -51,19 +51,23 @@ class Anggota extends Authenticatable
         $ikk = Ikk::where('nama', $this->asal_ikk)->first();
         $ikkCode = $ikk ? $ikk->kode : '00';
         
-        // Get the highest number from all existing member numbers
-        $lastMember = self::whereNotNull('no_anggota')
-                         ->where('no_anggota', '!=', '')
-                         ->where('no_anggota', 'REGEXP', '^PMRJ-[0-9]{2}-[0-9]{4}$')
-                         ->orderByRaw('CAST(SUBSTRING(no_anggota, -4) AS UNSIGNED) DESC')
-                         ->first();
+        // Get all members with valid no_anggota and extract the highest number
+        $members = self::whereNotNull('no_anggota')
+                      ->where('no_anggota', '!=', '')
+                      ->where('no_anggota', 'LIKE', 'PMRJ-%')
+                      ->pluck('no_anggota');
         
-        if ($lastMember && !empty($lastMember->no_anggota)) {
-            $lastNumber = intval(substr($lastMember->no_anggota, -4));
-            $newNumber = $lastNumber + 1;
-        } else {
-            $newNumber = 1;
+        $maxNumber = 0;
+        foreach ($members as $memberNumber) {
+            if (preg_match('/PMRJ-\d{2}-(\d{4})/', $memberNumber, $matches)) {
+                $number = intval($matches[1]);
+                if ($number > $maxNumber) {
+                    $maxNumber = $number;
+                }
+            }
         }
+        
+        $newNumber = $maxNumber + 1;
         
         return "PMRJ-{$ikkCode}-" . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
     }

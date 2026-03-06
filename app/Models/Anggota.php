@@ -53,7 +53,6 @@ class Anggota extends Authenticatable
         
         $lastMember = self::whereNotNull('no_anggota')
                          ->where('no_anggota', '!=', '')
-                         ->where('asal_ikk', $this->asal_ikk)
                          ->orderBy('id', 'desc')
                          ->first();
         

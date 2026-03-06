@@ -13,7 +13,7 @@ Sistem informasi untuk mengelola keanggotaan Persatuan Masyarakat Riau Jakarta.
 ### Sistem Pendaftaran
 - Form registrasi dengan upload foto
 - Validasi data anggota (KTP, email, dll)
-- Generate nomor anggota otomatis (PMRJ-YY-XXXXXX)
+- Generate nomor anggota otomatis (PMRJ-{AA}-XXXX)
 - Auto login setelah registrasi berhasil
 
 ### Dashboard Anggota
@@ -82,22 +82,32 @@ Sistem informasi untuk mengelola keanggotaan Persatuan Masyarakat Riau Jakarta.
 
 ## Struktur Database
 
+### Tabel `ikk`
+- `id` - Primary key
+- `kode` - Kode IKK (2 digit)
+- `nama` - Nama Kota/Kabupaten
+- `timestamps` - Created at & Updated at
+
 ### Tabel `anggota`
 - `id` - Primary key
 - `nama_lengkap` - Nama lengkap anggota
 - `email` - Email (unique)
 - `password` - Password (hashed)
-- `no_ktp` - Nomor KTP (unique, 16 digit)
+- `nik` - NIK (unique, 16 digit)
 - `tempat_lahir` - Tempat lahir
 - `tanggal_lahir` - Tanggal lahir
 - `jenis_kelamin` - L/P
-- `alamat` - Alamat lengkap
+- `golongan_darah` - Golongan darah (A+, A-, B+, B-, AB+, AB-, O+, O-)
+- `alamat_jakarta` - Alamat di Jakarta
+- `kota_bagian` - Bagian kota Jakarta
+- `asal_ikk` - Asal IKK (12 Kota/Kabupaten Riau)
 - `no_telepon` - Nomor telepon
 - `pekerjaan` - Pekerjaan
+- `foto_ktp` - Path foto KTP
 - `foto` - Path foto anggota
-- `no_anggota` - Nomor anggota (unique, format: PMRJ-YY-XXXXXX)
+- `status_rumah` - Status rumah (Rumah Tetap/Rumah Kontrak)
+- `no_anggota` - Nomor anggota (unique, format: PMRJ-{AA}-XXXX)
 - `status` - Status anggota (pending/active/inactive)
-- `remember_token` - Token untuk remember me
 - `timestamps` - Created at & Updated at
 
 ## Routes

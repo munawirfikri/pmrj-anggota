@@ -100,11 +100,11 @@
                     @csrf
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                        <input type="email" name="email" value="{{ old('email') }}" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                        <input type="email" name="email" value="{{ old('email') }}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
                     </div>
                     <div class="mb-6">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                        <input type="password" name="password" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                        <input type="password" name="password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
                     </div>
                     <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-primary-dark">Masuk</button>
                 </form>
@@ -138,8 +138,8 @@
                             </div>
 
                             <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Email *</label>
-                                <input type="email" name="email" value="{{ old('email') }}" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Email </label>
+                                <input type="email" name="email" value="{{ old('email') }}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
                             </div>
 
                             <div>
@@ -153,47 +153,43 @@
                             </div>
 
                             <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Tanggal Lahir *</label>
-                                <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Tanggal Lahir </label>
+                                <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
                             </div>
 
                             <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Tempat Lahir *</label>
-                                <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir') }}" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Tempat Lahir </label>
+                                <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir') }}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
                             </div>
 
                             <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Jenis Kelamin *</label>
-                                <select name="jenis_kelamin" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Jenis Kelamin </label>
+                                <select name="jenis_kelamin" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
                                     <option value="">Pilih</option>
-                                    <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                                    <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                    @foreach($jenisKelaminList as $jk)
+                                        <option value="{{ $jk->nama }}" {{ old('jenis_kelamin') == $jk->nama ? 'selected' : '' }}>{{ $jk->nama }}</option>
+                                    @endforeach
                                 </select>
                             </div>
 
                             <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Golongan Darah *</label>
-                                <select name="golongan_darah" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Golongan Darah </label>
+                                <select name="golongan_darah" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
                                     <option value="">Pilih</option>
-                                    <option value="A+" {{ old('golongan_darah') == 'A+' ? 'selected' : '' }}>A+</option>
-                                    <option value="A-" {{ old('golongan_darah') == 'A-' ? 'selected' : '' }}>A-</option>
-                                    <option value="B+" {{ old('golongan_darah') == 'B+' ? 'selected' : '' }}>B+</option>
-                                    <option value="B-" {{ old('golongan_darah') == 'B-' ? 'selected' : '' }}>B-</option>
-                                    <option value="AB+" {{ old('golongan_darah') == 'AB+' ? 'selected' : '' }}>AB+</option>
-                                    <option value="AB-" {{ old('golongan_darah') == 'AB-' ? 'selected' : '' }}>AB-</option>
-                                    <option value="O+" {{ old('golongan_darah') == 'O+' ? 'selected' : '' }}>O+</option>
-                                    <option value="O-" {{ old('golongan_darah') == 'O-' ? 'selected' : '' }}>O-</option>
+                                    @foreach($golonganDarahList as $gd)
+                                        <option value="{{ $gd->nama }}" {{ old('golongan_darah') == $gd->nama ? 'selected' : '' }}>{{ $gd->nama }}</option>
+                                    @endforeach
                                 </select>
                             </div>
 
                             <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">NIK *</label>
-                                <input type="text" name="nik" value="{{ old('nik') }}" maxlength="16" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">NIK </label>
+                                <input type="text" name="nik" value="{{ old('nik') }}" maxlength="16" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
                             </div>
 
                             <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Pekerjaan *</label>
-                                <input type="text" name="pekerjaan" value="{{ old('pekerjaan') }}" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Pekerjaan </label>
+                                <input type="text" name="pekerjaan" value="{{ old('pekerjaan') }}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
                             </div>
                         </div>
 
@@ -202,59 +198,47 @@
                             <h4 class="text-lg font-semibold text-gray-900 border-b pb-2">Data Domisili & Keluarga</h4>
                             
                             <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Alamat Lengkap di Jakarta *</label>
-                                <textarea name="alamat_jakarta" required rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">{{ old('alamat_jakarta') }}</textarea>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Alamat Lengkap di Jakarta </label>
+                                <textarea name="alamat_jakarta" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">{{ old('alamat_jakarta') }}</textarea>
                             </div>
 
                             <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Kota Bagian *</label>
-                                <select name="kota_bagian" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Kota Bagian </label>
+                                <select name="kota_bagian" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
                                     <option value="">Pilih</option>
-                                    <option value="Jakarta Utara" {{ old('kota_bagian') == 'Jakarta Utara' ? 'selected' : '' }}>Jakarta Utara</option>
-                                    <option value="Jakarta Selatan" {{ old('kota_bagian') == 'Jakarta Selatan' ? 'selected' : '' }}>Jakarta Selatan</option>
-                                    <option value="Jakarta Barat" {{ old('kota_bagian') == 'Jakarta Barat' ? 'selected' : '' }}>Jakarta Barat</option>
-                                    <option value="Jakarta Timur" {{ old('kota_bagian') == 'Jakarta Timur' ? 'selected' : '' }}>Jakarta Timur</option>
-                                    <option value="Jakarta Pusat" {{ old('kota_bagian') == 'Jakarta Pusat' ? 'selected' : '' }}>Jakarta Pusat</option>
-                                    <option value="Kota Tangerang" {{ old('kota_bagian') == 'Kota Tangerang' ? 'selected' : '' }}>Kota Tangerang</option>
-                                    <option value="Kabupaten Tangerang" {{ old('kota_bagian') == 'Kabupaten Tangerang' ? 'selected' : '' }}>Kabupaten Tangerang</option>
-                                    <option value="Tangerang Selatan" {{ old('kota_bagian') == 'Tangerang Selatan' ? 'selected' : '' }}>Tangerang Selatan</option>
-                                    <option value="Depok" {{ old('kota_bagian') == 'Depok' ? 'selected' : '' }}>Depok</option>
-                                    <option value="Bekasi" {{ old('kota_bagian') == 'Bekasi' ? 'selected' : '' }}>Bekasi</option>
-                                    <option value="Bogor" {{ old('kota_bagian') == 'Bogor' ? 'selected' : '' }}>Bogor</option>
+                                    @foreach($kotaBagianList as $kb)
+                                        <option value="{{ $kb->nama }}" {{ old('kota_bagian') == $kb->nama ? 'selected' : '' }}>{{ $kb->nama }}</option>
+                                    @endforeach
                                 </select>
                             </div>
 
                             <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Nomor HP *</label>
-                                <input type="text" name="no_telepon" value="{{ old('no_telepon') }}" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
-                            </div>
-
-                            <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Foto KTP * (Maks 5MB)</label>
-                                <input type="file" name="foto_ktp" accept="image/*" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
-                            </div>
-
-                            <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Nama Orang Tua (Ayah/Ibu yang lahir di Riau) *</label>
-                                <input type="text" name="nama_ortu" value="{{ old('nama_ortu') }}" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
-                            </div>
-
-                            <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Tanggal Lahir Orang Tua *</label>
-                                <input type="date" name="tanggal_lahir_ortu" value="{{ old('tanggal_lahir_ortu') }}" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
-                            </div>
-
-                            <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Tempat Lahir Orang Tua *</label>
-                                <input type="text" name="tempat_lahir_ortu" value="{{ old('tempat_lahir_ortu') }}" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
-                            </div>
-
-                            <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Status Rumah *</label>
-                                <select name="status_rumah" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Asal IKK *</label>
+                                <select name="asal_ikk" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
                                     <option value="">Pilih</option>
-                                    <option value="Rumah Tetap" {{ old('status_rumah') == 'Rumah Tetap' ? 'selected' : '' }}>Rumah Tetap</option>
-                                    <option value="Rumah Kontrak" {{ old('status_rumah') == 'Rumah Kontrak' ? 'selected' : '' }}>Rumah Kontrak</option>
+                                    @foreach($ikkList as $ikk)
+                                        <option value="{{ $ikk->nama }}" {{ old('asal_ikk') == $ikk->nama ? 'selected' : '' }}>{{ $ikk->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Nomor HP </label>
+                                <input type="text" name="no_hp" value="{{ old('no_hp') }}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Foto KTP  (Maks 10MB)</label>
+                                <input type="file" name="foto_ktp" accept="image/" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Status Rumah </label>
+                                <select name="status_rumah" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                                    <option value="">Pilih</option>
+                                    @foreach($statusRumahList as $sr)
+                                        <option value="{{ $sr->nama }}" {{ old('status_rumah') == $sr->nama ? 'selected' : '' }}>{{ $sr->nama }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>

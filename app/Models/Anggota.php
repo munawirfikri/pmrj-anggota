@@ -24,12 +24,10 @@ class Anggota extends Authenticatable
         'pekerjaan',
         'alamat_jakarta',
         'kota_bagian',
-        'no_telepon',
+        'asal_ikk',
+        'no_hp',
         'foto_ktp',
         'foto',
-        'nama_ortu',
-        'tanggal_lahir_ortu',
-        'tempat_lahir_ortu',
         'status_rumah',
         'no_anggota',
         'status'
@@ -41,24 +39,31 @@ class Anggota extends Authenticatable
 
     protected $casts = [
         'tanggal_lahir' => 'date',
-        'tanggal_lahir_ortu' => 'date',
     ];
+
+    public function ikk()
+    {
+        return $this->belongsTo(Ikk::class, 'asal_ikk', 'nama');
+    }
 
     public function generateNoAnggota()
     {
-        $year = date('y'); // 2 digit tahun
+        $ikk = Ikk::where('nama', $this->asal_ikk)->first();
+        $ikkCode = $ikk ? $ikk->kode : '00';
+        
         $lastMember = self::whereNotNull('no_anggota')
                          ->where('no_anggota', '!=', '')
+                         ->where('asal_ikk', $this->asal_ikk)
                          ->orderBy('id', 'desc')
                          ->first();
         
         if ($lastMember && !empty($lastMember->no_anggota)) {
-            $lastNumber = intval(substr($lastMember->no_anggota, -6));
+            $lastNumber = intval(substr($lastMember->no_anggota, -4));
             $newNumber = $lastNumber + 1;
         } else {
             $newNumber = 1;
         }
         
-        return "PMRJ{$year}" . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+        return "PMRJ-{$ikkCode}-" . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
     }
 }

@@ -93,13 +93,13 @@
 <!-- Recent Activity -->
 <div class="bg-white rounded-lg shadow-lg">
     <div class="px-4 lg:px-6 py-4 border-b border-gray-200">
-        <h3 class="text-base lg:text-lg font-semibold text-gray-900">Agenda Terbaru</h3>
+        <h3 class="text-base lg:text-lg font-semibold text-gray-900">Berita Terbaru</h3>
     </div>
     <div class="p-4 lg:p-6">
         <div class="space-y-4" id="news-container">
             <div class="text-center py-4">
                 <i class="fas fa-spinner fa-spin text-blue-600 text-2xl"></i>
-                <p class="text-gray-500 mt-2">Memuat agenda...</p>
+                <p class="text-gray-500 mt-2">Memuat berita...</p>
             </div>
         </div>
     </div>

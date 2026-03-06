@@ -35,8 +35,7 @@
                 @endif
                 <div class="flex-1 text-center sm:text-left">
                     <h3 class="text-lg sm:text-xl font-bold">{{ $anggota->nama_lengkap }}</h3>
-                    <p class="text-blue-200">{{ $anggota->pekerjaan }}</p>
-                    <p class="text-blue-200">{{ $anggota->tempat_lahir }}, {{ $anggota->tanggal_lahir->format('d M Y') }}</p>
+                    <p class="text-blue-200">{{ $anggota->asal_ikk }}</p>
                 </div>
             </div>
 

@@ -4,36 +4,44 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Anggota;
+use App\Models\Ikk;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use App\Traits\CompressesImages;
 
 class HomeController extends Controller
 {
+    use CompressesImages;
     public function index()
     {
-        return view('welcome');
+        $ikkList = Ikk::orderBy('kode')->get();
+        $jenisKelaminList = DB::table('jenis_kelamin')->get();
+        $golonganDarahList = DB::table('golongan_darah')->get();
+        $kotaBagianList = DB::table('kota_bagian')->get();
+        $statusRumahList = DB::table('status_rumah')->get();
+        
+        return view('welcome', compact('ikkList', 'jenisKelaminList', 'golonganDarahList', 'kotaBagianList', 'statusRumahList'));
     }
 
     public function register(Request $request)
     {
         $request->validate([
             'nama_lengkap' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:anggota',
+            'asal_ikk' => 'required|exists:ikk,nama',
+            'email' => 'nullable|string|email|max:255|unique:anggota',
             'password' => 'required|string|min:8|confirmed',
-            'tanggal_lahir' => 'required|date',
-            'tempat_lahir' => 'required|string|max:255',
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'golongan_darah' => 'required|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
-            'nik' => 'required|string|size:16|unique:anggota',
-            'pekerjaan' => 'required|string|max:255',
-            'alamat_jakarta' => 'required|string',
-            'kota_bagian' => 'required|in:Jakarta Utara,Jakarta Selatan,Jakarta Barat,Jakarta Timur,Jakarta Pusat,Kota Tangerang,Kabupaten Tangerang,Tangerang Selatan,Depok,Bekasi,Bogor',
-            'no_telepon' => 'required|string|max:15',
-            'foto_ktp' => 'required|image|mimes:jpeg,png,jpg|max:5120',
-            'nama_ortu' => 'required|string|max:255',
-            'tanggal_lahir_ortu' => 'required|date',
-            'tempat_lahir_ortu' => 'required|string|max:255',
-            'status_rumah' => 'required|in:Rumah Tetap,Rumah Kontrak',
+            'tanggal_lahir' => 'nullable|date',
+            'tempat_lahir' => 'nullable|string|max:255',
+            'jenis_kelamin' => 'nullable|in:Laki-laki,Perempuan',
+            'golongan_darah' => 'nullable|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'nik' => 'nullable|string|size:16|unique:anggota',
+            'pekerjaan' => 'nullable|string|max:255',
+            'alamat_jakarta' => 'nullable|string',
+            'kota_bagian' => 'nullable|in:Jakarta Utara,Jakarta Selatan,Jakarta Barat,Jakarta Timur,Jakarta Pusat,Kota Tangerang,Kabupaten Tangerang,Tangerang Selatan,Depok,Bekasi,Bogor',
+            'no_hp' => 'nullable|string|max:15',
+            'foto_ktp' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'status_rumah' => 'nullable|in:Rumah Tetap,Rumah Kontrak',
         ], [
             'nama_lengkap.required' => 'Nama lengkap wajib diisi',
             'email.required' => 'Email wajib diisi',
@@ -52,25 +60,45 @@ class HomeController extends Controller
             'pekerjaan.required' => 'Pekerjaan wajib diisi',
             'alamat_jakarta.required' => 'Alamat lengkap di Jakarta wajib diisi',
             'kota_bagian.required' => 'Kota bagian wajib dipilih',
+            'asal_ikk.required' => 'Asal IKK wajib dipilih',
+            'asal_ikk.exists' => 'Asal IKK tidak valid',
             'no_telepon.required' => 'Nomor HP wajib diisi',
             'foto_ktp.required' => 'Foto KTP wajib diupload',
             'foto_ktp.image' => 'File harus berupa gambar',
             'foto_ktp.mimes' => 'Format foto harus JPG, PNG, atau JPEG',
             'foto_ktp.max' => 'Ukuran foto maksimal 5MB',
-            'nama_ortu.required' => 'Nama orang tua wajib diisi',
-            'tanggal_lahir_ortu.required' => 'Tanggal lahir orang tua wajib diisi',
-            'tempat_lahir_ortu.required' => 'Tempat lahir orang tua wajib diisi',
             'status_rumah.required' => 'Status rumah wajib dipilih'
         ]);
 
         $fotoKtpPath = null;
         if ($request->hasFile('foto_ktp')) {
-            $fotoKtpPath = $request->file('foto_ktp')->store('ktp', 'public');
+            $fotoKtpPath = $this->compressAndStore($request->file('foto_ktp'), 'ktp');
+        }
+
+        // Generate email if not provided
+        $email = $request->email;
+        if (empty($email)) {
+            $namaParts = explode(' ', $request->nama_lengkap);
+            $namaDepan = strtolower($namaParts[0]);
+            if (count($namaParts) > 1) {
+                $namaBelakang = strtolower($namaParts[1]);
+                $baseEmail = $namaDepan . '.' . $namaBelakang;
+            } else {
+                $baseEmail = $namaDepan;
+            }
+            
+            // Check if email exists and add suffix if needed
+            $email = $baseEmail . '@pmrj.or.id';
+            $counter = 1;
+            while (Anggota::where('email', $email)->exists()) {
+                $email = $baseEmail . $counter . '@pmrj.or.id';
+                $counter++;
+            }
         }
 
         $anggota = Anggota::create([
             'nama_lengkap' => $request->nama_lengkap,
-            'email' => $request->email,
+            'email' => $email,
             'password' => Hash::make($request->password),
             'tanggal_lahir' => $request->tanggal_lahir,
             'tempat_lahir' => $request->tempat_lahir,
@@ -80,11 +108,9 @@ class HomeController extends Controller
             'pekerjaan' => $request->pekerjaan,
             'alamat_jakarta' => $request->alamat_jakarta,
             'kota_bagian' => $request->kota_bagian,
-            'no_telepon' => $request->no_telepon,
+            'asal_ikk' => $request->asal_ikk,
+            'no_hp' => $request->no_hp,
             'foto_ktp' => $fotoKtpPath,
-            'nama_ortu' => $request->nama_ortu,
-            'tanggal_lahir_ortu' => $request->tanggal_lahir_ortu,
-            'tempat_lahir_ortu' => $request->tempat_lahir_ortu,
             'status_rumah' => $request->status_rumah,
             'status' => 'active'
         ]);
@@ -123,18 +149,8 @@ class HomeController extends Controller
     public function getNews()
     {
         try {
-            // Get category ID for 'agenda'
-            $categoryUrl = 'https://ikmkbjakarta.or.id/wp-json/wp/v2/categories?slug=agenda';
-            $categoryData = json_decode(file_get_contents($categoryUrl), true);
-            
-            if (empty($categoryData)) {
-                return response()->json([]);
-            }
-            
-            $categoryId = $categoryData[0]['id'];
-            
-            // Get posts from agenda category
-            $postsUrl = "https://ikmkbjakarta.or.id/wp-json/wp/v2/posts?categories={$categoryId}&per_page=5&_embed";
+            // Get posts from pmrj.or.id
+            $postsUrl = "https://pmrj.or.id/wp-json/wp/v2/posts?per_page=5&_embed";
             $postsData = json_decode(file_get_contents($postsUrl), true);
             
             if (!$postsData) {

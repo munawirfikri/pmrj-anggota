@@ -30,7 +30,7 @@
                         Ganti Foto
                     </label>
                     <input type="file" id="foto" name="foto" accept="image/*" class="hidden" onchange="previewPhoto(this)">
-                    <p class="text-sm text-gray-500 mt-2">Format: JPG, PNG. Maksimal 2MB (Opsional)</p>
+                    <p class="text-sm text-gray-500 mt-2">Format: JPG, PNG. Maksimal 10MB (Opsional)</p>
                 </div>
             </div>
 
@@ -45,36 +45,43 @@
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Email *</label>
-                        <input type="email" name="email" value="{{ $anggota->email }}" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        <input type="email" name="email" value="{{ $anggota->email }}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
                     </div>
 
                     <div>
                         <label class="block text-gray-700 text-sm font-bold mb-2">NIK</label>
-                        <input type="text" value="{{ $anggota->nik }}" disabled class="w-full px-3 py-2 border rounded-lg bg-gray-100 text-gray-600">
-                        <p class="text-sm text-gray-500 mt-1">NIK tidak dapat diubah</p>
+                        <input type="text" name="nik" value="{{ $anggota->nik }}" maxlength="16" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Tempat Lahir *</label>
-                        <input type="text" name="tempat_lahir" value="{{ $anggota->tempat_lahir }}" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Tempat Lahir</label>
+                        <input type="text" name="tempat_lahir" value="{{ $anggota->tempat_lahir }}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Tanggal Lahir *</label>
-                        <input type="date" name="tanggal_lahir" value="{{ $anggota->tanggal_lahir->format('Y-m-d') }}" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Tanggal Lahir</label>
+                        <input type="date" name="tanggal_lahir" value="{{ $anggota->tanggal_lahir ? $anggota->tanggal_lahir->format('Y-m-d') : '' }}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
                     </div>
 
                     <div>
                         <label class="block text-gray-700 text-sm font-bold mb-2">Jenis Kelamin</label>
-                        <input type="text" value="{{ $anggota->jenis_kelamin }}" disabled class="w-full px-3 py-2 border rounded-lg bg-gray-100 text-gray-600">
-                        <p class="text-sm text-gray-500 mt-1">Jenis kelamin tidak dapat diubah</p>
+                        <select name="jenis_kelamin" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            <option value="">Pilih</option>
+                            @foreach($jenisKelaminList as $jk)
+                                <option value="{{ $jk->nama }}" {{ $anggota->jenis_kelamin == $jk->nama ? 'selected' : '' }}>{{ $jk->nama }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div>
                         <label class="block text-gray-700 text-sm font-bold mb-2">Golongan Darah</label>
-                        <input type="text" value="{{ $anggota->golongan_darah }}" disabled class="w-full px-3 py-2 border rounded-lg bg-gray-100 text-gray-600">
-                        <p class="text-sm text-gray-500 mt-1">Golongan darah tidak dapat diubah</p>
+                        <select name="golongan_darah" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            <option value="">Pilih</option>
+                            @foreach($golonganDarahList as $gd)
+                                <option value="{{ $gd->nama }}" {{ $anggota->golongan_darah == $gd->nama ? 'selected' : '' }}>{{ $gd->nama }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
 
@@ -83,42 +90,44 @@
                     <h4 class="text-base sm:text-lg font-semibold text-gray-900 border-b pb-2">Informasi Kontak & Alamat</h4>
                     
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">No. Telepon *</label>
-                        <input type="text" name="no_telepon" value="{{ $anggota->no_telepon }}" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">No. HP</label>
+                        <input type="text" name="no_hp" value="{{ $anggota->no_hp }}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Pekerjaan *</label>
-                        <input type="text" name="pekerjaan" value="{{ $anggota->pekerjaan }}" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Pekerjaan</label>
+                        <input type="text" name="pekerjaan" value="{{ $anggota->pekerjaan }}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Alamat Lengkap di Jakarta *</label>
-                        <textarea name="alamat_jakarta" required rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">{{ $anggota->alamat_jakarta }}</textarea>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Alamat Lengkap di Jakarta</label>
+                        <textarea name="alamat_jakarta" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">{{ $anggota->alamat_jakarta }}</textarea>
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Kota Bagian *</label>
-                        <select name="kota_bagian" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
-                            <option value="Jakarta Utara" {{ $anggota->kota_bagian == 'Jakarta Utara' ? 'selected' : '' }}>Jakarta Utara</option>
-                            <option value="Jakarta Selatan" {{ $anggota->kota_bagian == 'Jakarta Selatan' ? 'selected' : '' }}>Jakarta Selatan</option>
-                            <option value="Jakarta Barat" {{ $anggota->kota_bagian == 'Jakarta Barat' ? 'selected' : '' }}>Jakarta Barat</option>
-                            <option value="Jakarta Timur" {{ $anggota->kota_bagian == 'Jakarta Timur' ? 'selected' : '' }}>Jakarta Timur</option>
-                            <option value="Jakarta Pusat" {{ $anggota->kota_bagian == 'Jakarta Pusat' ? 'selected' : '' }}>Jakarta Pusat</option>
-                            <option value="Kota Tangerang" {{ $anggota->kota_bagian == 'Kota Tangerang' ? 'selected' : '' }}>Kota Tangerang</option>
-                            <option value="Kabupaten Tangerang" {{ $anggota->kota_bagian == 'Kabupaten Tangerang' ? 'selected' : '' }}>Kabupaten Tangerang</option>
-                            <option value="Tangerang Selatan" {{ $anggota->kota_bagian == 'Tangerang Selatan' ? 'selected' : '' }}>Tangerang Selatan</option>
-                            <option value="Depok" {{ $anggota->kota_bagian == 'Depok' ? 'selected' : '' }}>Depok</option>
-                            <option value="Bekasi" {{ $anggota->kota_bagian == 'Bekasi' ? 'selected' : '' }}>Bekasi</option>
-                            <option value="Bogor" {{ $anggota->kota_bagian == 'Bogor' ? 'selected' : '' }}>Bogor</option>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Kota Bagian</label>
+                        <select name="kota_bagian" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            @foreach($kotaBagianList as $kb)
+                                <option value="{{ $kb->nama }}" {{ $anggota->kota_bagian == $kb->nama ? 'selected' : '' }}>{{ $kb->nama }}</option>
+                            @endforeach
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Status Rumah *</label>
-                        <select name="status_rumah" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
-                            <option value="Rumah Tetap" {{ $anggota->status_rumah == 'Rumah Tetap' ? 'selected' : '' }}>Rumah Tetap</option>
-                            <option value="Rumah Kontrak" {{ $anggota->status_rumah == 'Rumah Kontrak' ? 'selected' : '' }}>Rumah Kontrak</option>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Asal IKK *</label>
+                        <select name="asal_ikk" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            @foreach($ikkList as $ikk)
+                                <option value="{{ $ikk->nama }}" {{ $anggota->asal_ikk == $ikk->nama ? 'selected' : '' }}>{{ $ikk->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Status Rumah</label>
+                        <select name="status_rumah" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            @foreach($statusRumahList as $sr)
+                                <option value="{{ $sr->nama }}" {{ $anggota->status_rumah == $sr->nama ? 'selected' : '' }}>{{ $sr->nama }}</option>
+                            @endforeach
                         </select>
                     </div>
 

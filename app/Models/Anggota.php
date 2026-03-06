@@ -51,9 +51,11 @@ class Anggota extends Authenticatable
         $ikk = Ikk::where('nama', $this->asal_ikk)->first();
         $ikkCode = $ikk ? $ikk->kode : '00';
         
+        // Get the highest number from all existing member numbers
         $lastMember = self::whereNotNull('no_anggota')
                          ->where('no_anggota', '!=', '')
-                         ->orderBy('id', 'desc')
+                         ->where('no_anggota', 'REGEXP', '^PMRJ-[0-9]{2}-[0-9]{4}$')
+                         ->orderByRaw('CAST(SUBSTRING(no_anggota, -4) AS UNSIGNED) DESC')
                          ->first();
         
         if ($lastMember && !empty($lastMember->no_anggota)) {

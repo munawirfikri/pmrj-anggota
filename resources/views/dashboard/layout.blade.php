@@ -69,7 +69,7 @@
                                 <p class="text-sm text-gray-500">{{ auth('anggota')->user()->no_anggota }}</p>
                             </div>
                             @if(auth('anggota')->user()->foto && auth('anggota')->user()->foto !== 'default/avatar.png')
-                                <img src="{{ asset('storage/' . auth('anggota')->user()->foto) }}" alt="Foto" class="w-10 h-10 rounded-full object-cover">
+                                <img src="{{ auth('anggota')->user()->foto_url }}" alt="Foto" class="w-10 h-10 rounded-full object-cover">
                             @else
                                 <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
                                     <i class="fas fa-user text-gray-600"></i>

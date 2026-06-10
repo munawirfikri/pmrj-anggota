@@ -46,6 +46,12 @@ class Anggota extends Authenticatable
         return $this->belongsTo(Ikk::class, 'asal_ikk', 'nama');
     }
 
+    public function getFotoUrlAttribute()
+    {
+        $prefix = config('filesystems.public_url_prefix', 'storage');
+        return asset($prefix . '/' . $this->foto);
+    }
+
     public function generateNoAnggota()
     {
         $ikk = Ikk::where('nama', $this->asal_ikk)->first();

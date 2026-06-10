@@ -24,7 +24,7 @@
     <div class="bg-white rounded-lg shadow-lg p-4 lg:p-6">
         <div class="text-center">
             @if($anggota->foto && $anggota->foto !== 'default/avatar.png')
-                <img src="{{ asset('storage/' . $anggota->foto) }}" alt="Foto" class="w-20 lg:w-24 h-20 lg:h-24 rounded-full mx-auto mb-4 object-cover">
+                <img src="{{ $anggota->foto_url }}" alt="Foto" class="w-20 lg:w-24 h-20 lg:h-24 rounded-full mx-auto mb-4 object-cover">
             @else
                 <div class="w-20 lg:w-24 h-20 lg:h-24 bg-gray-300 rounded-full mx-auto mb-4 flex items-center justify-center">
                     <i class="fas fa-user text-gray-600 text-2xl"></i>

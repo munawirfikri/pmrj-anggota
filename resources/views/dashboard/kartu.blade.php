@@ -27,7 +27,7 @@
             <!-- Member Photo and Info -->
             <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-6">
                 @if($anggota->foto && $anggota->foto !== 'default/avatar.png')
-                    <img src="{{ asset('storage/' . $anggota->foto) }}" alt="Foto" class="w-20 sm:w-24 h-20 sm:h-24 rounded-full object-cover border-4 border-white border-opacity-30">
+                    <img src="{{ $anggota->foto_url }}" alt="Foto" class="w-20 sm:w-24 h-20 sm:h-24 rounded-full object-cover border-4 border-white border-opacity-30">
                 @else
                     <div class="w-20 sm:w-24 h-20 sm:h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center border-4 border-white border-opacity-30">
                         <i class="fas fa-user text-3xl"></i>

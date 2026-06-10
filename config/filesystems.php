@@ -66,6 +66,8 @@ return [
     |
     */
 
+    'public_url_prefix' => env('PUBLIC_STORAGE_URL_PREFIX', 'storage'),
+
     'links' => [
         public_path('storage') => storage_path('app/public'),
     ],

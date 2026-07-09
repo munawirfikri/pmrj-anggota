@@ -21,14 +21,22 @@ class Anggota extends Authenticatable
         'jenis_kelamin',
         'golongan_darah',
         'nik',
+        'no_kk',
         'pekerjaan',
+        'nama_perusahaan',
+        'jabatan',
+        'alamat_kantor',
         'alamat_jakarta',
         'kota_bagian',
         'asal_ikk',
         'no_hp',
         'foto_ktp',
+        'foto_kk',
         'foto',
         'status_rumah',
+        'nama_keluarga_dekat',
+        'alamat_keluarga_dekat',
+        'no_hp_keluarga_dekat',
         'no_anggota',
         'status'
     ];
@@ -46,10 +54,33 @@ class Anggota extends Authenticatable
         return $this->belongsTo(Ikk::class, 'asal_ikk', 'nama');
     }
 
+    public function cetakKartuRequests()
+    {
+        return $this->hasMany(CetakKartuRequest::class, 'anggota_id');
+    }
+
     public function getFotoUrlAttribute()
     {
         $prefix = config('filesystems.public_url_prefix', 'storage');
         return asset($prefix . '/' . $this->foto);
+    }
+
+    public function getFotoKtpUrlAttribute()
+    {
+        if (!$this->foto_ktp) {
+            return null;
+        }
+        $prefix = config('filesystems.public_url_prefix', 'storage');
+        return asset($prefix . '/' . $this->foto_ktp);
+    }
+
+    public function getFotoKkUrlAttribute()
+    {
+        if (!$this->foto_kk) {
+            return null;
+        }
+        $prefix = config('filesystems.public_url_prefix', 'storage');
+        return asset($prefix . '/' . $this->foto_kk);
     }
 
     public function generateNoAnggota()

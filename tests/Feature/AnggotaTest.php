@@ -177,4 +177,156 @@ class AnggotaTest extends TestCase
         $this->createdFiles[] = $anggota->foto;
         $this->assertTrue(file_exists(storage_path('app/public/' . $anggota->foto)));
     }
+
+    public function test_anggota_can_update_profile_with_new_fields_successfully()
+    {
+        $anggota = Anggota::create([
+            'nama_lengkap' => 'Budi Santoso',
+            'email' => 'budi.santoso@gmail.com',
+            'password' => Hash::make('password123'),
+            'nik' => '1234567890123456',
+            'asal_ikk' => 'Kota Pekanbaru',
+            'status' => 'active'
+        ]);
+
+        auth('anggota')->login($anggota);
+
+        $ktpFile = UploadedFile::fake()->image('ktp.png');
+        $kkFile = UploadedFile::fake()->image('kk.png');
+
+        $response = $this->put(route('profile.update'), [
+            'nama_lengkap' => 'Budi Santoso Update',
+            'email' => 'budi.santoso@gmail.com',
+            'nik' => '1234567890123456',
+            'no_kk' => '6543210987654321',
+            'asal_ikk' => 'Kota Pekanbaru',
+            'no_hp' => '081234567890',
+            'pekerjaan' => 'Swasta',
+            'nama_perusahaan' => 'PT Riau Sejahtera',
+            'jabatan' => 'Manager',
+            'alamat_kantor' => 'Jl. Jenderal Sudirman No. 20',
+            'nama_keluarga_dekat' => 'Siti Aminah',
+            'alamat_keluarga_dekat' => 'Jl. Pekanbaru Raya No. 5',
+            'no_hp_keluarga_dekat' => '081298765432',
+            'foto_ktp' => $ktpFile,
+            'foto_kk' => $kkFile,
+        ]);
+
+        $response->assertRedirect(route('profile'));
+        
+        $anggota->refresh();
+        $this->assertEquals('6543210987654321', $anggota->no_kk);
+        $this->assertEquals('PT Riau Sejahtera', $anggota->nama_perusahaan);
+        $this->assertEquals('Manager', $anggota->jabatan);
+        $this->assertEquals('Jl. Jenderal Sudirman No. 20', $anggota->alamat_kantor);
+        $this->assertEquals('Siti Aminah', $anggota->nama_keluarga_dekat);
+        
+        $this->assertNotNull($anggota->foto_ktp);
+        $this->assertNotNull($anggota->foto_kk);
+        $this->createdFiles[] = $anggota->foto_ktp;
+        $this->createdFiles[] = $anggota->foto_kk;
+        $this->assertTrue(file_exists(storage_path('app/public/' . $anggota->foto_ktp)));
+        $this->assertTrue(file_exists(storage_path('app/public/' . $anggota->foto_kk)));
+    }
+
+    public function test_anggota_can_request_print_card_when_requirements_are_met()
+    {
+        $anggota = Anggota::create([
+            'nama_lengkap' => 'Budi Santoso',
+            'email' => 'budi.santoso@gmail.com',
+            'password' => Hash::make('password123'),
+            'nik' => '1234567890123456',
+            'no_kk' => '6543210987654321',
+            'asal_ikk' => 'Kota Pekanbaru',
+            'no_hp' => '081234567890',
+            'pekerjaan' => 'Swasta',
+            'nama_perusahaan' => 'PT Riau Sejahtera',
+            'jabatan' => 'Manager',
+            'alamat_kantor' => 'Jl. Jenderal Sudirman No. 20',
+            'nama_keluarga_dekat' => 'Siti Aminah',
+            'alamat_keluarga_dekat' => 'Jl. Pekanbaru Raya No. 5',
+            'no_hp_keluarga_dekat' => '081298765432',
+            'foto_ktp' => 'ktp/fake_ktp.jpg',
+            'foto_kk' => 'kk/fake_kk.jpg',
+            'status' => 'active'
+        ]);
+
+        auth('anggota')->login($anggota);
+
+        $response = $this->post(route('kartu.request-cetak'));
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+        
+        $this->assertDatabaseHas('cetak_kartu_requests', [
+            'anggota_id' => $anggota->id,
+            'status' => 'pending'
+        ]);
+    }
+
+    public function test_anggota_cannot_request_print_card_when_requirements_are_incomplete()
+    {
+        $anggota = Anggota::create([
+            'nama_lengkap' => 'Budi Santoso',
+            'email' => 'budi.santoso@gmail.com',
+            'password' => Hash::make('password123'),
+            'nik' => '1234567890123456',
+            // no_kk is missing, foto_kk is missing
+            'asal_ikk' => 'Kota Pekanbaru',
+            'no_hp' => '081234567890',
+            'pekerjaan' => 'Swasta',
+            'nama_perusahaan' => 'PT Riau Sejahtera',
+            'jabatan' => 'Manager',
+            'alamat_kantor' => 'Jl. Jenderal Sudirman No. 20',
+            'foto_ktp' => 'ktp/fake_ktp.jpg',
+            'status' => 'active'
+        ]);
+
+        auth('anggota')->login($anggota);
+
+        $response = $this->post(route('kartu.request-cetak'));
+
+        $response->assertStatus(422);
+        $response->assertJson(['success' => false]);
+        $this->assertDatabaseMissing('cetak_kartu_requests', [
+            'anggota_id' => $anggota->id
+        ]);
+    }
+
+    public function test_anggota_cannot_request_print_card_twice_when_pending_request_exists()
+    {
+        $anggota = Anggota::create([
+            'nama_lengkap' => 'Budi Santoso',
+            'email' => 'budi.santoso@gmail.com',
+            'password' => Hash::make('password123'),
+            'nik' => '1234567890123456',
+            'no_kk' => '6543210987654321',
+            'asal_ikk' => 'Kota Pekanbaru',
+            'no_hp' => '081234567890',
+            'pekerjaan' => 'Swasta',
+            'nama_perusahaan' => 'PT Riau Sejahtera',
+            'jabatan' => 'Manager',
+            'alamat_kantor' => 'Jl. Jenderal Sudirman No. 20',
+            'nama_keluarga_dekat' => 'Siti Aminah',
+            'alamat_keluarga_dekat' => 'Jl. Pekanbaru Raya No. 5',
+            'no_hp_keluarga_dekat' => '081298765432',
+            'foto_ktp' => 'ktp/fake_ktp.jpg',
+            'foto_kk' => 'kk/fake_kk.jpg',
+            'status' => 'active'
+        ]);
+
+        auth('anggota')->login($anggota);
+
+        // Create initial pending request
+        \App\Models\CetakKartuRequest::create([
+            'anggota_id' => $anggota->id,
+            'status' => 'pending'
+        ]);
+
+        $response = $this->post(route('kartu.request-cetak'));
+
+        $response->assertStatus(400);
+        $response->assertJson(['success' => false]);
+        $this->assertEquals(1, \App\Models\CetakKartuRequest::where('anggota_id', $anggota->id)->count());
+    }
 }

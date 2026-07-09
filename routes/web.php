@@ -24,6 +24,7 @@ Route::post('/logout', [HomeController::class, 'logout'])->name('logout');
 Route::middleware('auth:anggota')->group(function () {
     Route::get('/dashboard', [AnggotaController::class, 'dashboard'])->name('dashboard');
     Route::get('/kartu-anggota', [AnggotaController::class, 'kartuAnggota'])->name('kartu.anggota');
+    Route::post('/request-cetak-kartu', [AnggotaController::class, 'requestCetakKartu'])->name('kartu.request-cetak');
     Route::get('/profile', [AnggotaController::class, 'profile'])->name('profile');
     Route::put('/profile', [AnggotaController::class, 'updateProfile'])->name('profile.update');
 });

@@ -6,10 +6,12 @@ use Illuminate\Http\UploadedFile;
 
 trait CompressesImages
 {
-    protected function compressAndStore(UploadedFile $file, string $path, int $quality = 80, int $maxWidth = 800): string
+    protected function compressAndStore(UploadedFile $file, string $path, ?string $identifier = null, int $quality = 80, int $maxWidth = 800): string
     {
         $extension = strtolower($file->getClientOriginalExtension());
-        $filename = time() . '_' . uniqid() . '.jpg';
+        $cleanIdentifier = $identifier ? \Illuminate\Support\Str::slug($identifier, '_') : uniqid();
+        $randomSuffix = strtolower(\Illuminate\Support\Str::random(5));
+        $filename = $path . '_' . $cleanIdentifier . '_' . $randomSuffix . '_' . time() . '.jpg';
         $fullPath = storage_path('app/public/' . $path . '/' . $filename);
         
         // Ensure directory exists

@@ -72,7 +72,7 @@ class HomeController extends Controller
 
         $fotoKtpPath = null;
         if ($request->hasFile('foto_ktp')) {
-            $fotoKtpPath = $this->compressAndStore($request->file('foto_ktp'), 'ktp');
+            $fotoKtpPath = $this->compressAndStore($request->file('foto_ktp'), 'ktp', $request->nama_lengkap);
         }
 
         // Generate email if not provided

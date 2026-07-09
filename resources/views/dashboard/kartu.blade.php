@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-2xl mx-auto px-4 sm:px-0">
     <!-- Digital Member Card -->
-    <div class="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-xl shadow-2xl p-4 sm:p-6 lg:p-8 text-white relative overflow-hidden">
+    <div id="digital-member-card" class="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-xl shadow-2xl p-4 sm:p-6 lg:p-8 text-white relative overflow-hidden">
         <!-- Background Pattern -->
         <div class="absolute inset-0 opacity-10">
             <div class="absolute top-0 left-0 w-40 h-40 bg-white rounded-full -translate-x-20 -translate-y-20"></div>
@@ -74,30 +74,58 @@
     <!-- QR Code Section -->
     <div class="mt-6 sm:mt-8 bg-white rounded-lg shadow-lg p-4 sm:p-6 text-center">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">QR Code Anggota</h3>
-        <div class="w-32 h-32 bg-gray-200 rounded-lg mx-auto flex items-center justify-center">
-            <i class="fas fa-qrcode text-4xl text-gray-500"></i>
+        <div class="w-32 h-32 mx-auto flex items-center justify-center bg-white p-1 border rounded-lg">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(route('kartu.anggota')) }}" alt="QR Code" class="w-full h-full object-contain">
         </div>
         <p class="text-sm text-gray-600 mt-2">Scan untuk verifikasi keanggotaan</p>
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
     function downloadCard() {
-        // Implementasi download kartu sebagai PDF atau gambar
-        alert('Fitur download akan segera tersedia');
+        const card = document.getElementById('digital-member-card');
+        
+        html2canvas(card, {
+            useCORS: true,
+            scale: 2,
+            backgroundColor: null
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'KTA_PMRJ_{{ $anggota->no_anggota }}.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }).catch(error => {
+            console.error('Download error:', error);
+            alert('Gagal mengunduh kartu.');
+        });
     }
 
     function shareCard() {
-        // Implementasi share kartu
+        const title = 'Kartu Anggota PMRJ';
+        const text = 'Saya adalah anggota PMRJ dengan nomor keanggotaan {{ $anggota->no_anggota }}.';
+        const url = window.location.href;
+
         if (navigator.share) {
             navigator.share({
-                title: 'Kartu Anggota PMRJ',
-                text: 'Saya adalah anggota PMRJ dengan nomor {{ $anggota->no_anggota }}',
-                url: window.location.href
+                title: title,
+                text: text,
+                url: url
+            }).catch(err => {
+                console.log('Share cancelled or failed', err);
             });
         } else {
-            // Fallback untuk browser yang tidak support Web Share API
-            alert('Link kartu telah disalin ke clipboard');
+            navigator.clipboard.writeText(url).then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Disalin!',
+                    text: 'Link kartu anggota telah disalin ke clipboard.',
+                    confirmButtonColor: '#3985c3'
+                });
+            }).catch(err => {
+                console.error('Clipboard copy error:', err);
+                alert('Gagal menyalin link ke clipboard.');
+            });
         }
     }
 </script>

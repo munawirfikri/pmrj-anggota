@@ -90,6 +90,7 @@ class AnggotaController extends Controller
         if ($request->hasFile('foto')) {
             if ($anggota->foto && $anggota->foto !== 'default/avatar.png') {
                 Storage::disk('public')->delete($anggota->foto);
+                \Log::info("Foto profil lama dihapus dari storage: " . $anggota->foto . " (ID Anggota: " . $anggota->id . ")");
             }
             $data['foto'] = $this->compressAndStore($request->file('foto'), 'photos');
         }
@@ -100,14 +101,20 @@ class AnggotaController extends Controller
                 'password.confirmed' => 'Konfirmasi password tidak cocok'
             ]);
             $data['password'] = Hash::make($request->password);
+            \Log::info("Password anggota diperbarui: " . $anggota->email . " (ID: " . $anggota->id . ")");
         }
 
+        $asalIkkChanged = ($request->asal_ikk !== $anggota->asal_ikk);
+
         $anggota->update($data);
+        \Log::info("Profil anggota diperbarui: " . $anggota->email . " (ID: " . $anggota->id . ")");
 
         // Update member number if asal_ikk changed
-        if ($request->asal_ikk !== $anggota->getOriginal('asal_ikk')) {
+        if ($asalIkkChanged) {
+            $oldNoAnggota = $anggota->no_anggota;
             $anggota->no_anggota = $anggota->generateNoAnggota();
             $anggota->save();
+            \Log::info("Nomor anggota diperbarui karena perubahan asal IKK. ID: {$anggota->id}, No Anggota lama: {$oldNoAnggota}, No Anggota baru: {$anggota->no_anggota}");
         }
 
         return redirect()->route('profile')->with('success', 'Profil berhasil diperbarui');

@@ -121,6 +121,8 @@ class HomeController extends Controller
 
             auth('anggota')->login($anggota);
 
+            \Log::info("Anggota baru terdaftar: {$anggota->nama_lengkap} (ID: {$anggota->id}, Email: {$anggota->email}, No Anggota: {$anggota->no_anggota})");
+
             return redirect()->route('dashboard')->with('success', 'Pendaftaran berhasil! Selamat datang di PMRJ');
         } catch (\Exception $e) {
             \Log::error('Registration error: ' . $e->getMessage());
@@ -140,9 +142,11 @@ class HomeController extends Controller
         ]);
 
         if (auth('anggota')->attempt($credentials)) {
+            \Log::info("Anggota login sukses: " . auth('anggota')->user()->email . " (ID: " . auth('anggota')->user()->id . ")");
             return redirect()->route('dashboard');
         }
 
+        \Log::warning("Percobaan login gagal untuk email: " . $request->email);
         return back()->withErrors(['email' => 'Email atau password salah']);
     }
 
@@ -176,6 +180,9 @@ class HomeController extends Controller
 
     public function logout()
     {
+        if (auth('anggota')->check()) {
+            \Log::info("Anggota logout: " . auth('anggota')->user()->email . " (ID: " . auth('anggota')->user()->id . ")");
+        }
         auth('anggota')->logout();
         return redirect()->route('home');
     }

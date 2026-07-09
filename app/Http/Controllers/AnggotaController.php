@@ -121,8 +121,8 @@ class AnggotaController extends Controller
             'alamat_keluarga_dekat' => 'nullable|string',
             'no_hp_keluarga_dekat' => 'nullable|string|max:15',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:10240',
-            'foto_ktp' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-            'foto_kk' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'foto_ktp' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:5120',
+            'foto_kk' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:5120',
         ], [
             'nama_lengkap.required' => 'Nama lengkap wajib diisi',
             'email.required' => 'Email wajib diisi',
@@ -145,11 +145,9 @@ class AnggotaController extends Controller
             'foto.image' => 'File harus berupa gambar',
             'foto.mimes' => 'Format foto harus JPG, PNG, atau JPEG',
             'foto.max' => 'Ukuran foto maksimal 10MB',
-            'foto_ktp.image' => 'File KTP harus berupa gambar',
-            'foto_ktp.mimes' => 'Format KTP harus JPG, PNG, atau JPEG',
+            'foto_ktp.mimes' => 'Format KTP harus JPG, PNG, JPEG, atau PDF',
             'foto_ktp.max' => 'Ukuran KTP maksimal 5MB',
-            'foto_kk.image' => 'File Kartu Keluarga harus berupa gambar',
-            'foto_kk.mimes' => 'Format Kartu Keluarga harus JPG, PNG, atau JPEG',
+            'foto_kk.mimes' => 'Format Kartu Keluarga harus JPG, PNG, JPEG, atau PDF',
             'foto_kk.max' => 'Ukuran Kartu Keluarga maksimal 5MB',
         ]);
 
@@ -164,7 +162,11 @@ class AnggotaController extends Controller
                 Storage::disk('public')->delete($anggota->foto);
                 \Log::info("Foto profil lama dihapus dari storage: " . $anggota->foto . " (ID Anggota: " . $anggota->id . ")");
             }
-            $data['foto'] = $this->compressAndStore($request->file('foto'), 'photos', $request->nama_lengkap);
+            try {
+                $data['foto'] = $this->compressAndStore($request->file('foto'), 'photos', $request->nama_lengkap);
+            } catch (\InvalidArgumentException $e) {
+                return back()->withErrors(['foto' => $e->getMessage()])->withInput();
+            }
         }
 
         if ($request->hasFile('foto_ktp')) {
@@ -172,7 +174,11 @@ class AnggotaController extends Controller
                 Storage::disk('public')->delete($anggota->foto_ktp);
                 \Log::info("Foto KTP lama dihapus dari storage: " . $anggota->foto_ktp . " (ID Anggota: " . $anggota->id . ")");
             }
-            $data['foto_ktp'] = $this->compressAndStore($request->file('foto_ktp'), 'ktp', $request->nama_lengkap);
+            try {
+                $data['foto_ktp'] = $this->compressAndStore($request->file('foto_ktp'), 'ktp', $request->nama_lengkap);
+            } catch (\InvalidArgumentException $e) {
+                return back()->withErrors(['foto_ktp' => $e->getMessage()])->withInput();
+            }
         }
 
         if ($request->hasFile('foto_kk')) {
@@ -180,7 +186,11 @@ class AnggotaController extends Controller
                 Storage::disk('public')->delete($anggota->foto_kk);
                 \Log::info("Foto KK lama dihapus dari storage: " . $anggota->foto_kk . " (ID Anggota: " . $anggota->id . ")");
             }
-            $data['foto_kk'] = $this->compressAndStore($request->file('foto_kk'), 'kk', $request->nama_lengkap);
+            try {
+                $data['foto_kk'] = $this->compressAndStore($request->file('foto_kk'), 'kk', $request->nama_lengkap);
+            } catch (\InvalidArgumentException $e) {
+                return back()->withErrors(['foto_kk' => $e->getMessage()])->withInput();
+            }
         }
 
         if ($request->filled('password')) {

@@ -97,28 +97,36 @@
                             <label class="block text-gray-700 text-sm font-bold mb-2">Foto KTP</label>
                             @if($anggota->foto_ktp)
                                 <div class="mb-2 flex items-center space-x-3 bg-blue-50 p-2 rounded-lg border border-blue-100">
-                                    <i class="fas fa-file-image text-blue-600 text-lg"></i>
+                                    @if(pathinfo(strtolower($anggota->foto_ktp), PATHINFO_EXTENSION) === 'pdf')
+                                        <i class="fas fa-file-pdf text-red-600 text-lg"></i>
+                                    @else
+                                        <i class="fas fa-file-image text-blue-600 text-lg"></i>
+                                    @endif
                                     <a href="{{ $anggota->foto_ktp_url }}" target="_blank" class="text-sm text-blue-600 hover:underline font-medium">Lihat KTP saat ini</a>
                                 </div>
                             @else
                                 <p class="text-xs text-red-500 mb-2 italic">Belum diunggah</p>
                             @endif
-                            <input type="file" name="foto_ktp" accept="image/*" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
-                            <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG. Maksimal 5MB</p>
+                            <input type="file" name="foto_ktp" accept="image/*,application/pdf" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG, PDF. Maksimal 5MB</p>
                         </div>
 
                         <div>
                             <label class="block text-gray-700 text-sm font-bold mb-2">Foto Kartu Keluarga (KK)</label>
                             @if($anggota->foto_kk)
                                 <div class="mb-2 flex items-center space-x-3 bg-blue-50 p-2 rounded-lg border border-blue-100">
-                                    <i class="fas fa-file-image text-blue-600 text-lg"></i>
+                                    @if(pathinfo(strtolower($anggota->foto_kk), PATHINFO_EXTENSION) === 'pdf')
+                                        <i class="fas fa-file-pdf text-red-600 text-lg"></i>
+                                    @else
+                                        <i class="fas fa-file-image text-blue-600 text-lg"></i>
+                                    @endif
                                     <a href="{{ $anggota->foto_kk_url }}" target="_blank" class="text-sm text-blue-600 hover:underline font-medium">Lihat KK saat ini</a>
                                 </div>
                             @else
                                 <p class="text-xs text-red-500 mb-2 italic">Belum diunggah</p>
                             @endif
-                            <input type="file" name="foto_kk" accept="image/*" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
-                            <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG. Maksimal 5MB</p>
+                            <input type="file" name="foto_kk" accept="image/*,application/pdf" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG, PDF. Maksimal 5MB</p>
                         </div>
                     </div>
                 </div>

@@ -40,7 +40,7 @@ class HomeController extends Controller
             'alamat_jakarta' => 'nullable|string',
             'kota_bagian' => 'nullable|in:Jakarta Utara,Jakarta Selatan,Jakarta Barat,Jakarta Timur,Jakarta Pusat,Kota Tangerang,Kabupaten Tangerang,Tangerang Selatan,Depok,Bekasi,Bogor',
             'no_hp' => 'nullable|string|max:15',
-            'foto_ktp' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'foto_ktp' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:5120',
             'status_rumah' => 'nullable|in:Rumah Tetap,Rumah Kontrak',
         ], [
             'nama_lengkap.required' => 'Nama lengkap wajib diisi',
@@ -64,15 +64,18 @@ class HomeController extends Controller
             'asal_ikk.exists' => 'Asal IKK tidak valid',
             'no_telepon.required' => 'Nomor HP wajib diisi',
             'foto_ktp.required' => 'Foto KTP wajib diupload',
-            'foto_ktp.image' => 'File harus berupa gambar',
-            'foto_ktp.mimes' => 'Format foto harus JPG, PNG, atau JPEG',
-            'foto_ktp.max' => 'Ukuran foto maksimal 5MB',
+            'foto_ktp.mimes' => 'Format KTP harus JPG, PNG, JPEG, atau PDF',
+            'foto_ktp.max' => 'Ukuran KTP maksimal 5MB',
             'status_rumah.required' => 'Status rumah wajib dipilih'
         ]);
 
         $fotoKtpPath = null;
         if ($request->hasFile('foto_ktp')) {
-            $fotoKtpPath = $this->compressAndStore($request->file('foto_ktp'), 'ktp', $request->nama_lengkap);
+            try {
+                $fotoKtpPath = $this->compressAndStore($request->file('foto_ktp'), 'ktp', $request->nama_lengkap);
+            } catch (\InvalidArgumentException $e) {
+                return back()->withErrors(['foto_ktp' => $e->getMessage()])->withInput();
+            }
         }
 
         // Generate email if not provided

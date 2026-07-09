@@ -228,8 +228,8 @@
                             </div>
 
                             <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Foto KTP  (Maks 10MB)</label>
-                                <input type="file" name="foto_ktp" accept="image/" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Foto KTP (Maks 5MB)</label>
+                                <input type="file" name="foto_ktp" accept="image/*,application/pdf" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary">
                             </div>
 
                             <div>

@@ -362,4 +362,143 @@ class AnggotaTest extends TestCase
         $response->assertStatus(404);
         $response->assertSee('Anggota Tidak Ditemukan');
     }
+
+    public function test_anggota_registration_success_with_pdf_ktp()
+    {
+        $file = UploadedFile::fake()->createWithContent('ktp.pdf', "%PDF-1.4\n%...dummy PDF data...");
+
+        $response = $this->post(route('register'), [
+            'nama_lengkap' => 'Budi Santoso PDF',
+            'email' => 'budi.santoso.pdf@gmail.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'asal_ikk' => 'Kota Pekanbaru',
+            'tanggal_lahir' => '1995-05-15',
+            'tempat_lahir' => 'Pekanbaru',
+            'jenis_kelamin' => 'Laki-laki',
+            'golongan_darah' => 'A+',
+            'pekerjaan' => 'Swasta',
+            'alamat_jakarta' => 'Jl. Merdeka No. 10',
+            'kota_bagian' => 'Jakarta Selatan',
+            'no_hp' => '081234567891',
+            'status_rumah' => 'Rumah Tetap',
+            'foto_ktp' => $file
+        ]);
+
+        $response->assertRedirect(route('dashboard'));
+        $this->assertDatabaseHas('anggota', [
+            'nama_lengkap' => 'Budi Santoso PDF',
+            'email' => 'budi.santoso.pdf@gmail.com',
+            'nik' => null,
+            'asal_ikk' => 'Kota Pekanbaru'
+        ]);
+
+        $anggota = Anggota::where('email', 'budi.santoso.pdf@gmail.com')->first();
+        $this->assertNotNull($anggota->foto_ktp);
+        $this->createdFiles[] = $anggota->foto_ktp;
+        $this->assertTrue(file_exists(storage_path('app/public/' . $anggota->foto_ktp)));
+        $this->assertStringEndsWith('.pdf', $anggota->foto_ktp);
+        
+        // Verify Magic Bytes
+        $handle = fopen(storage_path('app/public/' . $anggota->foto_ktp), 'rb');
+        $header = fread($handle, 4);
+        fclose($handle);
+        $this->assertEquals('%PDF', $header);
+    }
+
+    public function test_anggota_can_update_profile_with_pdf_ktp_and_kk()
+    {
+        $anggota = Anggota::create([
+            'nama_lengkap' => 'Budi Santoso PDF Update',
+            'email' => 'budi.santoso.pdf.update@gmail.com',
+            'password' => Hash::make('password123'),
+            'asal_ikk' => 'Kota Pekanbaru',
+            'status' => 'active'
+        ]);
+
+        auth('anggota')->login($anggota);
+
+        $ktpPdf = UploadedFile::fake()->createWithContent('ktp.pdf', "%PDF-1.4\n%...dummy PDF KTP...");
+        $kkPdf = UploadedFile::fake()->createWithContent('kk.pdf', "%PDF-1.4\n%...dummy PDF KK...");
+
+        $response = $this->put(route('profile.update'), [
+            'nama_lengkap' => 'Budi Santoso PDF Update',
+            'email' => 'budi.santoso.pdf.update@gmail.com',
+            'nik' => '1234567890123457',
+            'no_kk' => '6543210987654322',
+            'asal_ikk' => 'Kota Pekanbaru',
+            'no_hp' => '081234567892',
+            'pekerjaan' => 'Swasta',
+            'foto_ktp' => $ktpPdf,
+            'foto_kk' => $kkPdf,
+        ]);
+
+        $response->assertRedirect(route('profile'));
+        
+        $anggota->refresh();
+        $this->assertNotNull($anggota->foto_ktp);
+        $this->assertNotNull($anggota->foto_kk);
+        $this->createdFiles[] = $anggota->foto_ktp;
+        $this->createdFiles[] = $anggota->foto_kk;
+        $this->assertTrue(file_exists(storage_path('app/public/' . $anggota->foto_ktp)));
+        $this->assertTrue(file_exists(storage_path('app/public/' . $anggota->foto_kk)));
+        $this->assertStringEndsWith('.pdf', $anggota->foto_ktp);
+        $this->assertStringEndsWith('.pdf', $anggota->foto_kk);
+    }
+
+    public function test_uploaded_pdf_validation_fails_for_invalid_signature()
+    {
+        $anggota = Anggota::create([
+            'nama_lengkap' => 'Budi Bad PDF',
+            'email' => 'budi.bad.pdf@gmail.com',
+            'password' => Hash::make('password123'),
+            'asal_ikk' => 'Kota Pekanbaru',
+            'status' => 'active'
+        ]);
+
+        auth('anggota')->login($anggota);
+
+        // Uploaded file claims to be PDF but contains html/php content without %PDF header
+        $fakePdf = UploadedFile::fake()->createWithContent('ktp.pdf', "<?php echo 'hello'; ?>");
+
+        $response = $this->put(route('profile.update'), [
+            'nama_lengkap' => 'Budi Bad PDF',
+            'email' => 'budi.bad.pdf@gmail.com',
+            'asal_ikk' => 'Kota Pekanbaru',
+            'foto_ktp' => $fakePdf,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors(['foto_ktp']);
+        $errors = session('errors')->get('foto_ktp');
+        $this->assertStringContainsString('tidak valid', $errors[0]);
+    }
+
+    public function test_uploaded_pdf_validation_fails_for_malicious_content()
+    {
+        $anggota = Anggota::create([
+            'nama_lengkap' => 'Budi Malicious PDF',
+            'email' => 'budi.malicious.pdf@gmail.com',
+            'password' => Hash::make('password123'),
+            'asal_ikk' => 'Kota Pekanbaru',
+            'status' => 'active'
+        ]);
+
+        auth('anggota')->login($anggota);
+
+        // Uploaded file contains %PDF- but also a /JavaScript execution tag
+        $maliciousPdf = UploadedFile::fake()->createWithContent('ktp.pdf', "%PDF-1.4\n/JavaScript (alert('XSS'))");
+
+        $response = $this->put(route('profile.update'), [
+            'nama_lengkap' => 'Budi Malicious PDF',
+            'email' => 'budi.malicious.pdf@gmail.com',
+            'asal_ikk' => 'Kota Pekanbaru',
+            'foto_ktp' => $maliciousPdf,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors(['foto_ktp']);
+        $errors = session('errors')->get('foto_ktp');
+        $this->assertStringContainsString('mengandung konten aktif', $errors[0]);
+    }
 }

@@ -9,6 +9,47 @@ trait CompressesImages
     protected function compressAndStore(UploadedFile $file, string $path, ?string $identifier = null, int $quality = 80, int $maxWidth = 800): string
     {
         $extension = strtolower($file->getClientOriginalExtension());
+        $mimeType = $file->getMimeType();
+
+        if ($extension === 'pdf' || $mimeType === 'application/pdf') {
+            // Validate PDF Magic Bytes
+            $handle = fopen($file->getPathname(), 'rb');
+            if ($handle) {
+                $header = fread($handle, 4);
+                fclose($handle);
+                if ($header !== '%PDF') {
+                    throw new \InvalidArgumentException('Berkas PDF tidak valid.');
+                }
+            } else {
+                throw new \InvalidArgumentException('Tidak dapat membaca berkas.');
+            }
+
+            // Scan for active content / scripts in PDF
+            $content = file_get_contents($file->getPathname());
+            if (preg_match('/\/(JS|JavaScript|Launch|XFA|RichMedia)(?=[\s()<>\[\]{}%\/]|$)/i', $content)) {
+                throw new \InvalidArgumentException('Berkas PDF mengandung konten aktif atau skrip yang tidak didukung demi keamanan.');
+            }
+
+            // Secure filename generation
+            $cleanIdentifier = $identifier ? \Illuminate\Support\Str::slug($identifier, '_') : uniqid();
+            $randomSuffix = strtolower(\Illuminate\Support\Str::random(5));
+            $prefix = $path === 'photos' ? 'foto' : $path;
+            $filename = $prefix . '_' . $cleanIdentifier . '_' . $randomSuffix . '_' . time() . '.pdf';
+            $fullPath = storage_path('app/public/' . $path . '/' . $filename);
+
+            // Ensure directory exists
+            if (!file_exists(dirname($fullPath))) {
+                mkdir(dirname($fullPath), 0755, true);
+            }
+
+            // Move the file securely
+            if (!copy($file->getPathname(), $fullPath)) {
+                throw new \RuntimeException('Gagal menyimpan berkas PDF.');
+            }
+
+            return $path . '/' . $filename;
+        }
+
         $cleanIdentifier = $identifier ? \Illuminate\Support\Str::slug($identifier, '_') : uniqid();
         $randomSuffix = strtolower(\Illuminate\Support\Str::random(5));
         $prefix = $path === 'photos' ? 'foto' : $path;

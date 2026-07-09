@@ -20,6 +20,7 @@ Route::post('/register', [HomeController::class, 'register'])->name('register');
 Route::post('/login', [HomeController::class, 'login'])->name('login');
 Route::get('/api/news', [HomeController::class, 'getNews']);
 Route::post('/logout', [HomeController::class, 'logout'])->name('logout');
+Route::get('/verifikasi/anggota/{no_anggota}', [HomeController::class, 'verifyAnggota'])->name('kartu.verify');
 
 Route::middleware('auth:anggota')->group(function () {
     Route::get('/dashboard', [AnggotaController::class, 'dashboard'])->name('dashboard');

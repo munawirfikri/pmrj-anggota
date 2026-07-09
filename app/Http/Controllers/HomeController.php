@@ -186,4 +186,13 @@ class HomeController extends Controller
         auth('anggota')->logout();
         return redirect()->route('home');
     }
+
+    public function verifyAnggota($no_anggota)
+    {
+        $anggota = Anggota::where('no_anggota', $no_anggota)->first();
+        if (!$anggota) {
+            return response()->view('verifikasi.not_found', [], 404);
+        }
+        return view('verifikasi.anggota', compact('anggota'));
+    }
 }

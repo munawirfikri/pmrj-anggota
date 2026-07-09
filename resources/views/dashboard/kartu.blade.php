@@ -127,7 +127,7 @@
     <div class="mt-6 sm:mt-8 bg-white rounded-lg shadow-lg p-4 sm:p-6 text-center">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">QR Code Anggota</h3>
         <div class="w-32 h-32 mx-auto flex items-center justify-center bg-white p-1 border rounded-lg">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(route('kartu.anggota')) }}" alt="QR Code" class="w-full h-full object-contain">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(route('kartu.verify', $anggota->no_anggota ?? 'unverified')) }}" alt="QR Code" class="w-full h-full object-contain">
         </div>
         <p class="text-sm text-gray-600 mt-2">Scan untuk verifikasi keanggotaan</p>
     </div>

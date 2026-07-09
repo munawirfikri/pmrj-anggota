@@ -329,4 +329,37 @@ class AnggotaTest extends TestCase
         $response->assertJson(['success' => false]);
         $this->assertEquals(1, \App\Models\CetakKartuRequest::where('anggota_id', $anggota->id)->count());
     }
+
+    public function test_public_can_verify_active_member_successfully()
+    {
+        $anggota = Anggota::create([
+            'nama_lengkap' => 'Budi Santoso',
+            'email' => 'budi.santoso@gmail.com',
+            'password' => Hash::make('password123'),
+            'nik' => '1234567890123456',
+            'no_kk' => '6543210987654321',
+            'asal_ikk' => 'Kota Pekanbaru',
+            'no_hp' => '081234567890',
+            'pekerjaan' => 'Swasta',
+            'no_anggota' => 'PMRJ-01-0001',
+            'status' => 'active'
+        ]);
+
+        // Access verify page publicly (no auth)
+        $response = $this->get(route('kartu.verify', 'PMRJ-01-0001'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Budi Santoso');
+        $response->assertSee('PMRJ-01-0001');
+        $response->assertSee('Keanggotaan Terverifikasi');
+    }
+
+    public function test_public_verify_invalid_member_returns_404()
+    {
+        // Access non-existent member verify page publicly
+        $response = $this->get(route('kartu.verify', 'PMRJ-99-9999'));
+
+        $response->assertStatus(404);
+        $response->assertSee('Anggota Tidak Ditemukan');
+    }
 }
